@@ -22,11 +22,14 @@ public class MainMenu {
         alertService.start(30, 60);
 
         while (true) {
-            System.out.println("\n=== BANKING SIMULATOR ===");
-            System.out.println("1. Register");
-            System.out.println("2. Login");
-            System.out.println("3. Exit");
-            System.out.print("Choice: ");
+            System.out.println("\n=====================================");
+            System.out.println("         🏦 BANKING SIMULATOR 🏦       ");
+            System.out.println("  =====================================");
+            System.out.println("1️⃣  Register 📝");
+            System.out.println("2️⃣  Login 🔑");
+            System.out.println("3️⃣  Exit 🚪");
+            System.out.print("👉 Your Choice: ");
+
             int ch = Integer.parseInt(sc.nextLine().trim());
             if (ch == 1) doRegister();
             else if (ch == 2) doLogin();
@@ -57,18 +60,24 @@ public class MainMenu {
 
     private static void userMenu(User user) {
         while (true) {
-            System.out.println("\n--- USER MENU ---");
-            System.out.println("1. Create Account");
-            System.out.println("2. Deposit");
-            System.out.println("3. Withdraw");
-            System.out.println("4. Transfer");
-            System.out.println("5. Transaction History");
-            System.out.println("6. Export Transactions to file");
-            System.out.println("7. Update Threshold");
-            System.out.println("8. Display Balance");
-            System.out.println("9. Logout");
-            System.out.print("Choice: ");
+            System.out.println("\n=====================================");
+            System.out.println("               USER MENU             ");
+            System.out.println("=====================================");
+            System.out.println("1️⃣  Create Account");
+            System.out.println("2️⃣  💰 Deposit");
+            System.out.println("3️⃣  🏧 Withdraw");
+            System.out.println("4️⃣  🔄 Transfer Funds");
+            System.out.println("5️⃣  📜 Transaction History");
+            System.out.println("6️⃣  📁 Export Transactions to File");
+            System.out.println("7️⃣  ⚙️ Update Threshold");
+            System.out.println("8️⃣  💳 Display Balance");
+            System.out.println("9️⃣  🚪 Logout");
+            System.out.println("=====================================");
+            System.out.println(" ");
+            System.out.print("👉 Please choose an option: ");
+
             int c = Integer.parseInt(sc.nextLine().trim());
+            System.out.println(" ");
 
             try {
                 switch (c) {
@@ -87,7 +96,10 @@ public class MainMenu {
                         System.out.print("Amount: ");
                         BigDecimal am = new BigDecimal(sc.nextLine().trim());
                         txService.deposit(a, am);
-                        System.out.println("Deposit complete.");
+                        System.out.println("\n┌───────────────────────────┐");
+                        System.out.println("  │ 💰 Deposit Successful! 🎉│");
+                        System.out.println("  └───────────────────────────┘");
+
                     }
 
                     case 3 -> {
@@ -96,7 +108,10 @@ public class MainMenu {
                         System.out.print("Amount: ");
                         BigDecimal am = new BigDecimal(sc.nextLine().trim());
                         txService.withdraw(a, am);
-                        System.out.println("Withdraw complete.");
+                        System.out.println("\n┌─────────────────────────────────┐");
+                        System.out.println("  │ 🏧 Withdrawal Completed! 💸     │");
+                        System.out.println("  └─────────────────────────────────┘");
+
                     }
 
                     case 4 -> {
@@ -107,28 +122,56 @@ public class MainMenu {
                         System.out.print("Amount: ");
                         BigDecimal am = new BigDecimal(sc.nextLine().trim());
                         txService.transfer(fa, ta, am);
-                        System.out.println("Transfer complete.");
+                        System.out.println("\n┌──────────────────────────────────┐");
+                        System.out.println("  │ 🔁 Transfer Completed! 💸        │");
+                        System.out.println("  └──────────────────────────────────┘");
+
                     }
 
                     case 5 -> {
                         System.out.print("Account no: ");
                         int a = Integer.parseInt(sc.nextLine().trim());
                         var list = txService.history(a);
-                        System.out.println("Transaction history:");
+
+                        System.out.println("\n📜✨ Your Transaction History ✨📜");
+
+
                         list.forEach(t ->
                                 System.out.println(t.getTransactionId() + " | "
                                         + t.getType() + " | "
                                         + t.getAmount() + " | "
                                         + t.getCreatedAt())
                         );
+                        System.out.println("--------------------------------------------------");
+
                     }
 
                     case 6 -> {
                         System.out.print("Account no: ");
                         int a = Integer.parseInt(sc.nextLine().trim());
-                        System.out.print("File name (eg txs-123.txt): ");
+
+                        System.out.print("Enter your email to receive transactions: ");
+                        String userEmail = sc.nextLine().trim();
+
+                        System.out.print("File name (ex: txs-123.txt): ");
                         String fn = sc.nextLine().trim();
-                        System.out.println("Exported to: " + reporting.exportAccountTransactions(a, fn));
+
+// Export file
+                        String filePath = String.valueOf(reporting.exportAccountTransactions(a, fn));
+                        java.io.File file = new java.io.File(filePath);
+
+                        System.out.println("📁 File Exported: " + filePath);
+
+// Email the TXT file
+                        emailService.sendWithAttachment(
+                                userEmail,
+                                "📜 Transaction History | Account " + a,
+                                "Dear Customer,\n\nYour transaction history is attached.\n\nThank you for banking with us!\n— BankingSim",
+                                file
+                        );
+
+                        System.out.println("📧 Transaction history emailed successfully!");
+
                     }
 
                     case 7 -> {
@@ -137,7 +180,13 @@ public class MainMenu {
                         System.out.print("New threshold: ");
                         BigDecimal th = new BigDecimal(sc.nextLine().trim());
                         accountService.updateThreshold(a, th);
-                        System.out.println("Threshold updated.");
+                        System.out.println(
+                                """
+                                        -----------------------------------
+                                           ✔ Threshold Successfully Updated! 🎯
+                                        -----------------------------------"""
+                                );
+
                     }
 
 
@@ -145,7 +194,14 @@ public class MainMenu {
                         System.out.print("Account no: ");
                         int a = Integer.parseInt(sc.nextLine().trim());
                         BigDecimal balance = accountService.getBalance(a);
-                        System.out.println("Current Balance: ₹" + balance);
+                        System.out.println(
+                                "\n┌─────────────────────────────┐" +
+                                "\n│     💰 CURRENT BALANCE      │" +
+                                "\n├─────────────────────────────┤" +
+                                "\n│        ₹" + balance + "     │" +
+                                "\n└─────────────────────────────┘"
+                                );
+
                     }
 
                     case 9 -> {

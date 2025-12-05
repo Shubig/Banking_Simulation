@@ -65,4 +65,54 @@ public class EmailService {
             System.err.println("❌ EmailService error: " + e.getMessage());
         }
     }
+
+
+
+    // 📎 Send email with TXT attachment
+    public void sendWithAttachment(String to, String subject, String body, java.io.File file) {
+
+        if (!enabled) {
+            System.err.println("⚠ EmailService: Attachment email not sent (SMTP disabled)");
+            return;
+        }
+
+        try {
+            Session session = Session.getInstance(props, new Authenticator() {
+                @Override
+                protected PasswordAuthentication getPasswordAuthentication() {
+                    return new PasswordAuthentication(username, password);
+                }
+            });
+
+            MimeMessage msg = new MimeMessage(session);
+            msg.setFrom(new InternetAddress(username));
+            msg.setRecipients(Message.RecipientType.TO, InternetAddress.parse(to));
+            msg.setSubject(subject);
+
+            // Body part
+            MimeBodyPart textPart = new MimeBodyPart();
+            textPart.setText(body);
+
+            // Attachment part
+            MimeBodyPart filePart = new MimeBodyPart();
+            filePart.attachFile(file);
+
+            Multipart multipart = new MimeMultipart();
+            multipart.addBodyPart(textPart);
+            multipart.addBodyPart(filePart);
+
+            msg.setContent(multipart);
+
+            Transport.send(msg);
+            System.out.println("📨 Transaction history sent to email: " + to);
+
+        } catch (Exception e) {
+            System.err.println("❌ Attachment Email Error: " + e.getMessage());
+        }
+    }
+
+
+
+
+
 }

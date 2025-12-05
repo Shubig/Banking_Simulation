@@ -12,6 +12,7 @@ public class AlertService {
 
     public AlertService(EmailService emailService) { this.emailService = emailService; }
 
+
     public void start(long initialDelaySec, long periodSec) {
         scheduler.scheduleAtFixedRate(this::scan, initialDelaySec, periodSec, TimeUnit.SECONDS);
     }
